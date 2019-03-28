@@ -6,6 +6,7 @@ import org.gradle.api.tasks.Optional;
 import org.gradle.api.tasks.TaskAction;
 import org.gradle.api.tasks.options.Option;
 
+import io.quarkus.cli.commands.ExtensionFormat;
 import io.quarkus.cli.commands.ListExtensions;
 import io.quarkus.cli.commands.QuarkusCommandInvocation;
 import io.quarkus.cli.commands.writer.FileProjectWriter;
@@ -67,7 +68,7 @@ public class QuarkusListExtensions extends QuarkusPlatformTask {
     @Override
     protected void doExecute(QuarkusCommandInvocation invocation) {
         invocation.setValue(ListExtensions.ALL, isAll())
-                .setValue(ListExtensions.FORMAT, getFormat())
+                .setValue(ListExtensions.FORMAT, ExtensionFormat.findFormat(getFormat()))
                 .setValue(ListExtensions.SEARCH, getSearchPattern());
         try {
             new ListExtensions(new GradleBuildFileFromConnector(new FileProjectWriter(getProject().getProjectDir())))

@@ -27,15 +27,15 @@ public class AddExtensions implements QuarkusCommand {
     private BuildFile buildFile;
     private final static Printer PRINTER = new Printer();
 
-    public AddExtensions(final ProjectWriter writer) throws IOException {
+    public AddExtensions(final ProjectWriter writer) {
         this(new MavenBuildFile(writer));
     }
 
-    public AddExtensions(final ProjectWriter writer, final BuildTool buildTool) throws IOException {
+    public AddExtensions(final ProjectWriter writer, final BuildTool buildTool) {
         this.buildFile = buildTool.createBuildFile(writer);
     }
 
-    public AddExtensions(final BuildFile buildFile) throws IOException {
+    public AddExtensions(final BuildFile buildFile) {
         this.buildFile = buildFile;
     }
 

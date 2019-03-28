@@ -6,6 +6,7 @@ import org.apache.maven.plugin.MojoExecutionException;
 import org.apache.maven.plugins.annotations.Mojo;
 import org.apache.maven.plugins.annotations.Parameter;
 
+import io.quarkus.cli.commands.ExtensionFormat;
 import io.quarkus.cli.commands.ListExtensions;
 import io.quarkus.cli.commands.file.BuildFile;
 
@@ -40,7 +41,7 @@ public class ListExtensionsMojo extends BuildFileMojoBase {
     @Override
     public void doExecute(BuildFile buildFile) throws MojoExecutionException {
         try {
-            new ListExtensions(buildFile).listExtensions(all, format, searchPattern);
+            new ListExtensions(buildFile).listExtensions(all, ExtensionFormat.findFormat(format), searchPattern);
         } catch (IOException e) {
             throw new MojoExecutionException("Failed to list extensions", e);
         }

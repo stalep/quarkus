@@ -37,7 +37,7 @@ public class ListExtensions implements QuarkusCommand {
         }
     }
 
-    public void listExtensions(boolean all, String format, String search) throws IOException {
+    public void listExtensions(boolean all, ExtensionFormat format, String search) throws IOException {
         try {
             execute(new LegacyQuarkusCommandInvocation()
                     .setValue(ALL, all)
@@ -52,8 +52,7 @@ public class ListExtensions implements QuarkusCommand {
     public QuarkusCommandOutcome execute(QuarkusCommandInvocation invocation) throws QuarkusCommandException {
 
         final boolean all = invocation.getValue(ALL, true);
-        final String format = invocation.getValue(FORMAT, "concise");
-        final String search = invocation.getValue(SEARCH, "*");
+        final ExtensionFormat format = invocation.getValue(FORMAT, ExtensionFormat.CONCISE);
 
         Map<String, Dependency> installed;
         try {
@@ -62,13 +61,7 @@ public class ListExtensions implements QuarkusCommand {
             throw new QuarkusCommandException("Failed to determine the list of installed extensions", e);
         }
 
-        Stream<Extension> extensionsStream = invocation.getPlatformDescriptor().getExtensions().stream();
-        extensionsStream = extensionsStream.filter(e -> filterUnlisted(e));
-        if (search != null && !"*".equalsIgnoreCase(search)) {
-            final Pattern searchPattern = Pattern.compile(".*" + search + ".*", Pattern.CASE_INSENSITIVE);
-            extensionsStream = extensionsStream.filter(e -> filterBySearch(searchPattern, e));
-        }
-        List<Extension> loadedExtensions = extensionsStream.collect(Collectors.toList());
+        List<Extension> loadedExtensions = loadedExtensions(invocation);
 
         if (loadedExtensions.isEmpty()) {
             System.out.println("No extension found with this pattern");
@@ -77,22 +70,22 @@ public class ListExtensions implements QuarkusCommand {
             System.out.println(String.format("%nCurrent Quarkus extensions %s: ", extensionStatus));
 
             Consumer<String[]> currentFormatter;
-            switch (format.toLowerCase()) {
-                case "name":
+            switch (format) {
+                case NAME:
                     currentFormatter = this::nameFormatter;
                     break;
-                case "full":
+                case FULL:
                     currentFormatter = this::fullFormatter;
                     currentFormatter.accept(new String[] { "Status", "Extension", "ArtifactId", "Updated Version", "Guide" });
                     break;
-                case "concise":
+                case CONCISE:
                 default:
                     currentFormatter = this::conciseFormatter;
             }
 
             loadedExtensions.forEach(extension -> display(extension, installed, all, currentFormatter));
 
-            if ("concise".equalsIgnoreCase(format)) {
+            if (format == ExtensionFormat.CONCISE) {
             	if (this.buildFile instanceof GradleBuildFile) {
             		System.out.println("\nTo get more information, append --format=full to your command line.");
             	}
@@ -112,6 +105,17 @@ public class ListExtensions implements QuarkusCommand {
         }
 
         return QuarkusCommandOutcome.success();
+    }
+
+    public List<Extension> loadedExtensions(QuarkusCommandInvocation invocation) {
+        final String search = invocation.getValue(SEARCH, "*");
+        Stream<Extension> extensionsStream = invocation.getPlatformDescriptor().getExtensions().stream();
+        extensionsStream = extensionsStream.filter(e -> filterUnlisted(e));
+        if (search != null && !"*".equalsIgnoreCase(search)) {
+            final Pattern searchPattern = Pattern.compile(".*" + search + ".*", Pattern.CASE_INSENSITIVE);
+            extensionsStream = extensionsStream.filter(e -> filterBySearch(searchPattern, e));
+        }
+        return extensionsStream.collect(Collectors.toList());
     }
 
     private boolean filterUnlisted(Extension e) {

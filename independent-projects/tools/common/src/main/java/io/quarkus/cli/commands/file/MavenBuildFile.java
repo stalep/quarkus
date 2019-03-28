@@ -35,7 +35,7 @@ public class MavenBuildFile extends BuildFile {
 
     private Model model;
 
-    public MavenBuildFile(ProjectWriter writer) throws IOException {
+    public MavenBuildFile(ProjectWriter writer) {
         super(writer, BuildTool.MAVEN);
     }
 

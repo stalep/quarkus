@@ -50,11 +50,7 @@ public class AddExtensionMojo extends BuildFileMojoBase {
     public void doExecute(BuildFile buildFile) throws MojoExecutionException {
 
         if (buildFile == null) {
-            try {
-                buildFile = BuildTool.MAVEN.createBuildFile(new FileProjectWriter(project.getBasedir()));
-            } catch (IOException e) {
-                throw new MojoExecutionException("Failed to initialize the project's build descriptor", e);
-            }
+            buildFile = BuildTool.MAVEN.createBuildFile(new FileProjectWriter(project.getBasedir()));
         }
         Set<String> ext = new HashSet<>();
         if (extensions != null && !extensions.isEmpty()) {

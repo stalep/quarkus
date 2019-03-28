@@ -116,7 +116,7 @@ public class ListExtensionsTest extends PlatformAwareTestBase {
         try (final PrintStream printStream = new PrintStream(baos, false, "UTF-8")) {
             System.setOut(printStream);
             new ListExtensions(new MavenBuildFile(writer))
-                    .listExtensions(true, "full", null);
+                    .listExtensions(true, ExtensionFormat.FULL, null);
         } finally {
             System.setOut(out);
         }
@@ -176,7 +176,7 @@ public class ListExtensionsTest extends PlatformAwareTestBase {
         try (final PrintStream printStream = new PrintStream(baos, false, "UTF-8")) {
             System.setOut(printStream);
             new ListExtensions(new MavenBuildFile(writer))
-                    .listExtensions(true, "full", "unexpectedSearch");
+                    .listExtensions(true, ExtensionFormat.FULL, "unexpectedSearch");
         } finally {
             System.setOut(out);
         }
@@ -209,7 +209,7 @@ public class ListExtensionsTest extends PlatformAwareTestBase {
         try (final PrintStream printStream = new PrintStream(baos, false, "UTF-8")) {
             System.setOut(printStream);
             new ListExtensions(new MavenBuildFile(writer))
-                    .listExtensions(true, "full", "Rest");
+                    .listExtensions(true, ExtensionFormat.FULL, "Rest");
         } finally {
             System.setOut(out);
         }
