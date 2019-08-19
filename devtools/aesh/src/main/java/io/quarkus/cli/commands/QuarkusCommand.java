@@ -52,6 +52,7 @@ public class QuarkusCommand implements Command<CommandInvocation> {
                 .command(CreateProjectCommand.class)
                 .command(AddExtensionCommand.class)
                 .command(ListExtensionsCommand.class)
+                .command(DevModeCommand.class)
                 .prompt("[quarkus]$ ")
                 .addExitCommand()
                 .start();

@@ -24,7 +24,6 @@ import org.aesh.command.CommandResult;
 import org.aesh.command.invocation.CommandInvocation;
 import org.aesh.command.option.Argument;
 import org.aesh.command.option.Option;
-import org.aesh.io.Resource;
 
 /**
  * @author <a href="mailto:stalep@gmail.com">Ståle Pedersen</a>

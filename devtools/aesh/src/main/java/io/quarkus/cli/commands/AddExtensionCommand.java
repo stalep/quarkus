@@ -31,6 +31,7 @@ import org.aesh.io.Resource;
 import io.quarkus.cli.commands.writer.FileProjectWriter;
 import io.quarkus.dependencies.Extension;
 import io.quarkus.maven.utilities.MojoUtils;
+import org.aesh.selector.SelectorType;
 
 /**
  * @author <a href="mailto:stalep@gmail.com">Ståle Pedersen</a>
@@ -41,7 +42,8 @@ public class AddExtensionCommand implements Command<CommandInvocation> {
     @Option(shortName = 'h', hasValue = false, overrideRequired = true)
     private boolean help;
 
-    @Option(shortName = 'e', required = true, description = "Name of the extension that will be added to the project")
+    @Option(shortName = 'e', selector = SelectorType.SELECT, completer = ExtensionCompleter.class,
+            description = "Name of the extension that will be added to the project")
     private String extension;
 
     @Argument(required = true, description = "Path to the project pom the extension will be added")
