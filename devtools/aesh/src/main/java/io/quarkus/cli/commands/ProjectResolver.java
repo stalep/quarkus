@@ -17,6 +17,8 @@ package io.quarkus.cli.commands;
 
 import java.io.File;
 
+import io.quarkus.generators.BuildTool;
+
 /**
  * @author <a href="mailto:stalep@gmail.com">Ståle Pedersen</a>
  */
@@ -24,7 +26,7 @@ public class ProjectResolver {
 
     private File projectPath;
     private File projectFile;
-    private ProjectType projectType;
+    private BuildTool buildTool;
 
     public ProjectResolver(File projectPath) {
         this.projectPath = projectPath;
@@ -35,14 +37,14 @@ public class ProjectResolver {
         return projectFile;
     }
 
-    public ProjectType projectType() {
-        return projectType;
+    public BuildTool buildTool() {
+        return buildTool;
     }
 
     //for now just search for the default folders, in the future we would need to read the project files
     public File resolveBuildDir() {
         File buildDir;
-        if (projectType == ProjectType.MAVEN)
+        if (buildTool == BuildTool.MAVEN)
             buildDir = new File(projectPath.getAbsolutePath() + File.separatorChar + "target");
         else
             buildDir = new File(projectPath.getAbsolutePath() + File.separatorChar + "build");
@@ -61,11 +63,11 @@ public class ProjectResolver {
         for (String file : projectPath.list()) {
             if (file.equals("pom.xml")) {
                 projectFile = new File(projectPath + File.separator + file);
-                projectType = ProjectType.MAVEN;
+                buildTool = BuildTool.MAVEN;
                 return;
             } else if (file.equals("build.gradle")) {
                 projectFile = new File(projectPath + File.separator + file);
-                projectType = ProjectType.GRADLE;
+                buildTool = BuildTool.GRADLE;
                 return;
             }
         }

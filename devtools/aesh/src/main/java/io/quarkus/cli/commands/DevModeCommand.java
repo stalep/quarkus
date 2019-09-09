@@ -25,6 +25,8 @@ import org.aesh.command.invocation.CommandInvocation;
 import org.aesh.command.option.Argument;
 import org.aesh.command.option.Option;
 
+import io.quarkus.generators.BuildTool;
+
 /**
  * @author <a href="mailto:stalep@gmail.com">Ståle Pedersen</a>
  */
@@ -49,7 +51,7 @@ public class DevModeCommand implements Command<CommandInvocation> {
     @Argument(required = true, description = "Path to the project, if the project is located in the current directory, use \'.\'.")
     private File projectPath;
 
-    private ProjectType projectType;
+    private BuildTool buildTool;
     private File projectFile;
 
     @Override
@@ -57,7 +59,7 @@ public class DevModeCommand implements Command<CommandInvocation> {
 
         ProjectResolver projectResolver = new ProjectResolver(projectPath);
 
-        projectType = projectResolver.projectType();
+        buildTool = projectResolver.buildTool();
         projectFile = projectResolver.projectFile();
         if (buildDir == null)
             buildDir = projectResolver.resolveBuildDir();

@@ -15,23 +15,31 @@
  */
 package io.quarkus.cli.commands;
 
+import static java.util.Arrays.asList;
+
 import java.io.File;
 import java.io.IOException;
 import java.util.HashMap;
+import java.util.HashSet;
+import java.util.List;
 
 import org.aesh.command.Command;
 import org.aesh.command.CommandDefinition;
 import org.aesh.command.CommandResult;
 import org.aesh.command.invocation.CommandInvocation;
+import org.aesh.command.option.Argument;
 import org.aesh.command.option.Option;
+import org.aesh.command.option.OptionList;
 import org.aesh.io.Resource;
+import org.aesh.selector.SelectorType;
 
 import io.quarkus.cli.commands.writer.FileProjectWriter;
+import io.quarkus.generators.BuildTool;
 
 /**
  * @author <a href="mailto:stalep@gmail.com">Ståle Pedersen</a>
  */
-@CommandDefinition(name = "create-project", description = "Creates a base Quarkus maven project")
+@CommandDefinition(name = "create-project", description = "Creates a base Quarkus project")
 public class CreateProjectCommand implements Command<CommandInvocation> {
 
     @Option(shortName = 'h', hasValue = false)
@@ -46,7 +54,13 @@ public class CreateProjectCommand implements Command<CommandInvocation> {
     @Option(shortName = 'v', defaultValue = "1.0.0-SNAPSHOT")
     private String version;
 
-    @Option(shortName = 'p', description = "path for the project")
+    @Option(shortName = 'b', selector = SelectorType.SELECT, description = "Build tool type for the project", completer = ProjectTypeCompleter.class)
+    private BuildTool buildTool;
+
+    @OptionList(shortName = 'e', description = "Extensions that will be added to the build file", completer = ExtensionCompleter.class, selector = SelectorType.SELECTIONS)
+    private List<String> extensions;
+
+    @Argument(description = "The folder where the new project will be located", required = true)
     private Resource path;
 
     public CommandResult execute(CommandInvocation commandInvocation) {
@@ -57,13 +71,24 @@ public class CreateProjectCommand implements Command<CommandInvocation> {
 
         if (path != null) {
             try {
-                boolean status = new CreateProject(new FileProjectWriter(new File(path.getAbsolutePath())))
+                FileProjectWriter projectWriter = new FileProjectWriter(new File(path.getAbsolutePath()));
+                boolean status = new CreateProject(projectWriter)
                         .groupId(groupid)
                         .artifactId(artifactid)
                         .version(this.version)
+                        .buildTool(buildTool)
                         .doCreateProject(new HashMap<>());
+
+                if (extensions != null && extensions.size() > 0)
+                    new AddExtensions(projectWriter)
+                            .addExtensions(new HashSet<>(extensions));
+                else
+                    new AddExtensions(projectWriter)
+                            .addExtensions(new HashSet<>(asList("resteasy")));
+
                 if (status) {
-                    commandInvocation.println("Project " + artifactid + " created successfully.");
+                    commandInvocation
+                            .println("Project " + artifactid + " created successfully at " + path.getAbsolutePath() + ".");
                 } else {
                     commandInvocation.println("Failed to create project");
                 }

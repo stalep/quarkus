@@ -15,12 +15,13 @@
  */
 package io.quarkus.cli.commands;
 
-import io.quarkus.dependencies.Extension;
-import io.quarkus.maven.utilities.MojoUtils;
+import java.util.stream.Collectors;
+
 import org.aesh.command.completer.CompleterInvocation;
 import org.aesh.command.completer.OptionCompleter;
 
-import java.util.stream.Collectors;
+import io.quarkus.dependencies.Extension;
+import io.quarkus.maven.utilities.MojoUtils;
 
 /**
  * @author <a href="mailto:stalep@gmail.com">Ståle Pedersen</a>
@@ -29,12 +30,12 @@ public class ExtensionCompleter implements OptionCompleter<CompleterInvocation> 
 
     @Override
     public void complete(CompleterInvocation invocation) {
-        if(invocation.getGivenCompleteValue().length() == 0) {
-            invocation.addAllCompleterValues(MojoUtils.loadExtensions().stream().map(Extension::getName).collect(Collectors.toList()));
-        }
-        else {
-            for(Extension loadExtension : MojoUtils.loadExtensions()) {
-                if(loadExtension.getName().startsWith(invocation.getGivenCompleteValue()))
+        if (invocation.getGivenCompleteValue().length() == 0) {
+            invocation.addAllCompleterValues(
+                    MojoUtils.loadExtensions().stream().map(Extension::getName).collect(Collectors.toList()));
+        } else {
+            for (Extension loadExtension : MojoUtils.loadExtensions()) {
+                if (loadExtension.getName().startsWith(invocation.getGivenCompleteValue()))
                     invocation.addCompleterValue(loadExtension.getName());
             }
         }
