@@ -53,7 +53,7 @@ public class CreateProjectCommand implements Command<CommandInvocation> {
     @OptionList(shortName = 'e', completer = ExtensionCompleter.class, selector = SelectorType.SELECTIONS, description = "Extensions that will be added to the build file")
     private List<String> extensions;
 
-    @Argument(required = true, description = "Path to the new project, if not set it will use the current working directory")
+    @Argument(description = "Path to the new project, if not set it will use the current working directory")
     private Resource path;
 
     public CommandResult execute(CommandInvocation invocation) {
@@ -73,6 +73,7 @@ public class CreateProjectCommand implements Command<CommandInvocation> {
             FileProjectWriter projectWriter = new FileProjectWriter(projectDirectory);
             final Map<String, Object> context = new HashMap<>();
             context.put("path", resourcePath);
+            invocation.println("groupId: " + groupId + ", artifactId: " + artifactId + ", classname: " + className);
             boolean status = new CreateProject(projectWriter)
                     .groupId(groupId)
                     .artifactId(artifactId)
@@ -107,6 +108,10 @@ public class CreateProjectCommand implements Command<CommandInvocation> {
         className = shell.readLine("Set the resource class name, ( " + defaultResourceName + " ): ");
         if (className == null || className.length() == 0)
             className = defaultResourceName;
+        else {
+            className = groupId.replace("-", ".").replace("_", ".") + className;
+        }
+
         if (resourcePath == null || resourcePath.length() == 0) {
             resourcePath = shell.readLine("Set the resource path (" + getDerivedPath(className) + "): ");
             if (resourcePath == null || resourcePath.length() == 0)
