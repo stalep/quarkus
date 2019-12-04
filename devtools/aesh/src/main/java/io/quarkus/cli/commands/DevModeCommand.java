@@ -33,7 +33,9 @@ import io.quarkus.generators.BuildTool;
 @CommandDefinition(name = "dev-mode", description = "Starts up a development mode process for a Quarkus project.")
 public class DevModeCommand implements Command<CommandInvocation> {
 
-    @Option(shortName = 'd', description = "If this server should be started in debug mode. " +
+    @Option(shortName = 'd', completer = DevModeDebugCompleter.class,
+            validator = DevModeDebugValidator.class,
+            description = "If this server should be started in debug mode. " +
             "The default is to start in debug mode without suspending and listen on port 5005." +
             " It supports the following options:\n" +
             " \"false\" - The JVM is not started in debug mode\n" +
@@ -42,13 +44,15 @@ public class DevModeCommand implements Command<CommandInvocation> {
             "\"{port}\" - The JVM is started in debug mode and suspends until a debugger is attached to {port}")
     private String debug;
 
-    @Option(shortName = 'b', name = "build", description = "Build folder")
+    @Option(shortName = 'b', name = "build",
+            description = "Build folder, if not set the default folder for the used build tool will be used")
     private File buildDir;
 
-    @Option(shortName = 's', name = "source", description = "Source folder")
+    @Option(shortName = 's', name = "source",
+            description = "Source folder, if not set the default folder for the used build tool will be used")
     private File sourceDir;
 
-    @Argument(required = true, description = "Path to the project, if the project is located in the current directory, use \'.\'.")
+    @Argument(description = "Path to the project, if not set it will use the current working directory")
     private File projectPath;
 
     private BuildTool buildTool;

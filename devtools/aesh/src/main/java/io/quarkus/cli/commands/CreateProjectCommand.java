@@ -42,10 +42,10 @@ public class CreateProjectCommand implements Command<CommandInvocation> {
     private String version;
 
     @Option(shortName = 'c', name = "classname", description = "Rest resource name, by default set to: groupId+artifactId+HelloResource")
-    String className;
+    private String className;
 
     @Option(shortName = 'p', name = "resourcepath", description = "Rest resource path, by default set to /hello")
-    String resourcePath;
+    private String resourcePath;
 
     @Option(shortName = 'b', selector = SelectorType.SELECT, completer = ProjectTypeCompleter.class, converter = BuildToolConverter.class, description = "Build tool type for the project")
     private BuildTool buildTool;
@@ -63,7 +63,7 @@ public class CreateProjectCommand implements Command<CommandInvocation> {
             if (className == null) {
                 invocation.print("Do you want to create a REST resource? (y/n) ");
                 KeyAction input = invocation.input();
-                invocation.println(Config.getLineSeparator());
+                invocation.print(Config.getLineSeparator());
                 if (input == Key.y)
                     processClassName(invocation.getShell());
             }
@@ -73,7 +73,6 @@ public class CreateProjectCommand implements Command<CommandInvocation> {
             FileProjectWriter projectWriter = new FileProjectWriter(projectDirectory);
             final Map<String, Object> context = new HashMap<>();
             context.put("path", resourcePath);
-            invocation.println("groupId: " + groupId + ", artifactId: " + artifactId + ", classname: " + className);
             boolean status = new CreateProject(projectWriter)
                     .groupId(groupId)
                     .artifactId(artifactId)
@@ -103,13 +102,12 @@ public class CreateProjectCommand implements Command<CommandInvocation> {
     }
 
     private void processClassName(Shell shell) throws InterruptedException {
-        String defaultResourceName = groupId.replace("-", ".")
-                .replace("_", ".") + ".HelloResource";
-        className = shell.readLine("Set the resource class name, ( " + defaultResourceName + " ): ");
+        String defaultResourceName = groupId.replace("-", ".").replace("_", ".");
+        className = shell.readLine("Set the resource class name, ( HelloResource ): ");
         if (className == null || className.length() == 0)
-            className = defaultResourceName;
+            className = defaultResourceName + ".HelloResource";
         else {
-            className = groupId.replace("-", ".").replace("_", ".") + className;
+            className = defaultResourceName + "."+ className;
         }
 
         if (resourcePath == null || resourcePath.length() == 0) {
