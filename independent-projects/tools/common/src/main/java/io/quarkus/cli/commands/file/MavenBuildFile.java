@@ -5,7 +5,9 @@ import static io.quarkus.maven.utilities.MojoUtils.plugin;
 
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
+import java.io.File;
 import java.io.IOException;
+import java.nio.file.Files;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
@@ -97,6 +99,27 @@ public class MavenBuildFile extends BuildFile {
         final String pluginArtifactId = ToolsUtils.getPluginArtifactId(props);
         addMainPluginConfig(pluginGroupId, pluginArtifactId);
         addNativeProfile(pluginGroupId, pluginArtifactId);
+    }
+
+    @Override
+    public boolean hasWrapper() {
+        return getWrapper() != null;
+    }
+
+    @Override
+    public File getWrapper() {
+        if(System.getProperty("os.name").startsWith("Windows")) {
+            File wrapper = new File(getWriter().getProjectFolder().getAbsolutePath()+File.separator+"mvnw.bat");
+            if(wrapper.isFile())
+                return wrapper;
+        }
+        else {
+            File wrapper = new File(getWriter().getProjectFolder().getAbsolutePath() + File.separator + "mvnw");
+            if (wrapper.isFile())
+                return wrapper;
+        }
+
+        return null;
     }
 
     private void addBom(QuarkusPlatformDescriptor platform) throws IOException {

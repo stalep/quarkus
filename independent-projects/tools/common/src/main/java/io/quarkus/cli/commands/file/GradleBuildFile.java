@@ -2,6 +2,7 @@ package io.quarkus.cli.commands.file;
 
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
+import java.io.File;
 import java.io.IOException;
 import java.nio.charset.StandardCharsets;
 import java.util.Collections;
@@ -208,6 +209,28 @@ public class GradleBuildFile extends BuildFile {
         // Gradle tooling API only provide resolved dependencies.
         return Collections.emptyList();
     }
+
+    @Override
+    public boolean hasWrapper() {
+        return getWrapper() != null;
+    }
+
+    @Override
+    public File getWrapper() {
+        if(System.getProperty("os.name").startsWith("Windows")) {
+            File wrapper = new File(getWriter().getProjectFolder().getAbsolutePath()+File.separator+"gradlew.bat");
+            if(wrapper.isFile())
+                return wrapper;
+        }
+        else {
+            File wrapper = new File(getWriter().getProjectFolder().getAbsolutePath() + File.separator + "gradlew");
+            if (wrapper.isFile())
+                return wrapper;
+        }
+
+        return null;
+    }
+
 
     private Model getModel() throws IOException {
         if (model == null) {

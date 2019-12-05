@@ -29,7 +29,9 @@ import org.aesh.terminal.utils.Config;
 @GroupCommandDefinition(name = QuarkusBaseCommand.COMMAND_NAME, generateHelp = true, groupCommands = {
         ListExtensionsCommand.class,
         AddExtensionCommand.class,
-        CreateProjectCommand.class }, description = "<command> [<args>] \n\nThese are the common quarkus commands used in various situations")
+        CreateProjectCommand.class,
+        DevModeCommand.class,
+        CompileProjectCommand.class }, description = "<command> [<args>] \n\nThese are the common quarkus commands used in various situations")
 public class QuarkusBaseCommand implements Command<CommandInvocation> {
     public static final String COMMAND_NAME = "quarkus";
 
@@ -55,6 +57,7 @@ public class QuarkusBaseCommand implements Command<CommandInvocation> {
                     .command(AddExtensionCommand.class)
                     .command(ListExtensionsCommand.class)
                     .command(DevModeCommand.class)
+                    .command(CompileProjectCommand.class)
                     .prompt("[quarkus@" + Config.getUserDir() + "]$ ")
                     .addExitCommand()
                     .start();

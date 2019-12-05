@@ -4,6 +4,7 @@ import static io.quarkus.maven.utilities.MojoUtils.credentials;
 import static java.util.stream.Collectors.toList;
 
 import java.io.Closeable;
+import java.io.File;
 import java.io.IOException;
 import java.util.Collections;
 import java.util.List;
@@ -136,4 +137,7 @@ public abstract class BuildFile implements Closeable {
         return writer;
     }
 
+    public abstract boolean hasWrapper();
+
+    public abstract File getWrapper();
 }

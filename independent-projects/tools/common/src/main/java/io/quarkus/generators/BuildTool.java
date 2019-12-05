@@ -1,7 +1,5 @@
 package io.quarkus.generators;
 
-import java.io.IOException;
-
 import io.quarkus.cli.commands.file.BuildFile;
 import io.quarkus.cli.commands.file.GradleBuildFile;
 import io.quarkus.cli.commands.file.MavenBuildFile;

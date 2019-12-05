@@ -107,7 +107,7 @@ public class CreateProjectCommand implements Command<CommandInvocation> {
         if (className == null || className.length() == 0)
             className = defaultResourceName + ".HelloResource";
         else {
-            className = defaultResourceName + "."+ className;
+            className = defaultResourceName + "." + className;
         }
 
         if (resourcePath == null || resourcePath.length() == 0) {
