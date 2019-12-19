@@ -54,7 +54,7 @@ public class AddExtensionCommand implements Command<CommandInvocation> {
 
             BuildFile buildFile = BuildFileUtil.findExistingBuildFile(projectDirectory);
             if (buildFile == null) {
-
+                invocation.println("No build file in "+projectDirectory+" found. Will not attempt to add any extensions.");
             } else {
                 AddExtensions project = new AddExtensions(buildFile);
                 QuarkusCommandOutcome result = project.execute(quarkusInvocation);

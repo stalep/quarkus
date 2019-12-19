@@ -16,18 +16,24 @@
 package io.quarkus.cli.commands;
 
 import java.io.File;
+import java.io.IOException;
 import java.util.List;
 
+import io.quarkus.cli.commands.file.BuildFile;
+import io.quarkus.cli.commands.file.BuildFileUtil;
 import org.aesh.command.Command;
 import org.aesh.command.CommandDefinition;
 import org.aesh.command.CommandException;
+import org.aesh.command.CommandNotFoundException;
 import org.aesh.command.CommandResult;
 import org.aesh.command.invocation.CommandInvocation;
 import org.aesh.command.option.Argument;
 import org.aesh.command.option.Option;
 import org.aesh.command.option.OptionList;
 
-import io.quarkus.generators.BuildTool;
+import org.aesh.command.parser.CommandLineParserException;
+import org.aesh.command.validator.CommandValidatorException;
+import org.aesh.command.validator.OptionValidatorException;
 
 /**
  * @author <a href="mailto:stalep@gmail.com">Ståle Pedersen</a>
@@ -77,23 +83,50 @@ public class DevModeCommand implements Command<CommandInvocation> {
     @Argument(description = "Path to the project, if not set it will use the current working directory")
     private File projectPath;
 
-    private BuildTool buildTool;
-    private File projectFile;
+    private BuildFile buildFile;
 
     @Override
     public CommandResult execute(CommandInvocation invocation) throws CommandException, InterruptedException {
 
-        ProjectResolver projectResolver = new ProjectResolver(projectPath);
+        if(!verifyProjectStatus(invocation))
+            return CommandResult.FAILURE;
 
-        buildTool = projectResolver.buildTool();
-        projectFile = projectResolver.projectFile();
-
-        if (buildDir == null)
-            buildDir = projectResolver.resolveBuildDir();
-        if (sourceDir == null)
-            sourceDir = projectResolver.resolveSourceDir();
 
         return CommandResult.SUCCESS;
     }
 
+    private boolean verifyProjectStatus(CommandInvocation invocation) {
+
+        buildFile = BuildFileUtil.findExistingBuildFile(projectPath);
+
+        if(buildDir == null)
+            buildDir = new File(buildFile.getBuildTool().getBuildDirectory());
+
+        if (sourceDir == null)
+            sourceDir = resolveSourceDir();
+
+        if(!sourceDir.isDirectory()) {
+            invocation.println("ERROR: The project's sources directory does not exists ("+sourceDir);
+            return false;
+        }
+
+        if (!buildDir.isDirectory() || !new File(buildDir, "classes").isDirectory()) {
+            invocation.println("Build directory ("+buildDir+" wasn't found. Compiling...");
+            try {
+                invocation.executeCommand("compile-project");
+            }
+            catch (CommandNotFoundException | CommandLineParserException | OptionValidatorException |
+                    CommandValidatorException | CommandException | InterruptedException | IOException e) {
+                invocation.println("Failure during compile, aborting: "+e.getMessage());
+                return false;
+            }
+        }
+
+        return true;
+    }
+
+    private File resolveSourceDir() {
+        return new File(projectPath.getAbsolutePath() + File.separatorChar + "src"
+                + File.separatorChar + "main" + File.separatorChar + "java");
+    }
 }
